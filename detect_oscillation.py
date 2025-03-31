@@ -5,13 +5,12 @@ from scipy.stats import mode
 from sklearn.cluster import KMeans
 from scipy import stats
 
-def detect_oscillation_regions(signal, tolerance=4.5, min_length=5, debug=False, signal_name=None, trend_threshold=3, strictness_level=1, allowed_consecutive=5, equal_tolerance=0.25):
+def detect_oscillation_regions(signal, min_length=5, debug=False, signal_name=None, equal_tolerance=0.25):
     """
     Detect oscillation regions in a signal
     
     Parameters:
     - signal: 1D array, signal values
-    - tolerance: float, tolerance for direction change
     - min_length: int, minimum length of the interval
     - debug: bool, whether to output debug information
     - signal_name: string, signal name (for debugging)
@@ -144,14 +143,13 @@ def detect_oscillation_regions(signal, tolerance=4.5, min_length=5, debug=False,
     
     return target_regions
 
-def visualize_oscillation_regions(df, save_path=None, highlight_red_box=False, min_length=5):
+def visualize_oscillation_regions(df, save_path=None, min_length=5):
     """
     Visualize signal and mark target intervals and trend intervals
     
     Parameters:
     - df: DataFrame, containing signal data
     - save_path: string, path to save image
-    - highlight_red_box: bool, whether to highlight red box area
     - min_length: int, minimum length of the interval
     """
     # Modify chart size to make chart taller, not as flat
@@ -296,17 +294,12 @@ def visualize_oscillation_regions(df, save_path=None, highlight_red_box=False, m
 if __name__ == "__main__":
     # 讀取數據
     try:
-        # 優先使用處理過的數據
+        # 直接讀取處理過的數據
         df = pd.read_csv('refined_test_data.csv')
-        print("Using processed data: refined_test_data.csv")
+        print("Using data: refined_test_data.csv")
     except FileNotFoundError:
-        try:
-            # 如果找不到處理過的數據，則使用原始測試數據
-            df = pd.read_csv('test_data.csv')
-            print("Using original test data: test_data.csv")
-        except FileNotFoundError:
-            print("Data file not found. Please ensure refined_test_data.csv or test_data.csv exists")
-            exit(1)
+        print("Data file not found. Please ensure refined_test_data.csv exists")
+        exit(1)
     
     # 定義目標區間檢測參數
     min_length = 5  # 目標區間的最小長度
@@ -315,6 +308,5 @@ if __name__ == "__main__":
     visualize_oscillation_regions(
         df, 
         save_path='signal_visualization.png', 
-        highlight_red_box=False,
         min_length=min_length
     ) 
