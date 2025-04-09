@@ -30,13 +30,9 @@ plt.plot(data)
 plt.plot(peaks, data[peaks], 'ro', label='Python Peaks')
 
 # Load C version results
-try:
-    c_results = np.loadtxt('c_find_peaks_results.csv', delimiter=',', skiprows=1, usecols=(0,1,2))
-    c_peaks = c_results[c_results[:, 2] == 1, 0].astype(int)
-    plt.plot(c_peaks, data[c_peaks], 'gx', label='C Peaks')
-except Exception as e:
-    print(f"Could not load C results: {e}")
-    c_peaks = []
+c_results = np.loadtxt('c_find_peaks_results.csv', delimiter=',', skiprows=1, usecols=(0,1,2))
+c_peaks = c_results[c_results[:, 2] == 1, 0].astype(int)
+plt.plot(c_peaks, data[c_peaks], 'gx', label='C Peaks')
 
 plt.legend()
 plt.title('Python vs C find_peaks Comparison')

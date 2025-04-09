@@ -1,6 +1,6 @@
 /**
- * find_peak.h - C版本的峰值檢測函數
- * 轉換自Python的scipy.signal模塊中的find_peaks功能
+ * find_peak.h - C implementation of peak detection functions
+ * Converted from Python's scipy.signal module find_peaks functionality
  */
 
 #ifndef FIND_PEAK_H
@@ -13,88 +13,63 @@
 #include <float.h>
 #include <string.h>
 
-// 定義返回的峰值屬性結構
+// Define the structure for returning peak properties
 typedef struct {
-    double* peak_heights;       // 峰值高度
-    double* left_thresholds;    // 左側閾值
-    double* right_thresholds;   // 右側閾值
-    double* prominences;        // 顯著性
-    size_t* left_bases;         // 左側基底
-    size_t* right_bases;        // 右側基底
-    double* widths;             // 寬度
-    double* width_heights;      // 寬度高度
-    double* left_ips;           // 左側交叉點
-    double* right_ips;          // 右側交叉點
-    size_t* plateau_sizes;      // 平台大小
-    size_t* left_edges;         // 左側邊緣
-    size_t* right_edges;        // 右側邊緣
-    size_t count;               // 峰值數量
+    double* peak_heights;       // Peak heights
+    double* prominences;        // Prominences
+    size_t* left_bases;         // Left bases
+    size_t* right_bases;        // Right bases
+    double* widths;             // Widths
+    double* width_heights;      // Width heights
+    double* left_ips;           // Left intersection points
+    double* right_ips;          // Right intersection points
+    size_t* plateau_sizes;      // Plateau sizes
+    size_t* left_edges;         // Left edges
+    size_t* right_edges;        // Right edges
+    size_t count;               // Number of peaks
 } PeakProperties;
 
-// 主要的峰值查找函數
+// Main peak finding function
 /**
- * 查找信號中的峰值
- * @param x 輸入信號數組
- * @param n 信號長度
- * @param height_min 最小高度 (可為NULL)
- * @param height_max 最大高度 (可為NULL)
- * @param threshold_min 最小閾值 (可為NULL)
- * @param threshold_max 最大閾值 (可為NULL)
- * @param distance 峰值間最小距離 (可為0表示不考慮)
- * @param prominence_min 最小顯著性 (可為NULL)
- * @param prominence_max 最大顯著性 (可為NULL)
- * @param width_min 最小寬度 (可為NULL)
- * @param width_max 最大寬度 (可為NULL)
- * @param wlen 用於計算顯著性的窗口大小 (可為0表示使用全部信號)
- * @param rel_height 用於計算寬度的相對高度 (0-1之間)
- * @param plateau_size_min 最小平台大小 (可為NULL)
- * @param plateau_size_max 最大平台大小 (可為NULL)
- * @param peaks 輸出的峰值索引數組 (需要使用free釋放)
- * @param properties 輸出的峰值屬性 (需要使用free_peak_properties釋放)
- * @return 峰值數量
+ * Find peaks in a signal
+ * @param x Input signal array
+ * @param n Signal length
+ * @param height_min Minimum height (can be NULL)
+ * @param distance Minimum distance between peaks (can be 0 to ignore)
+ * @param prominence_min Minimum prominence (can be NULL)
+ * @param width_min Minimum width (can be NULL)
+ * @param wlen Window length for calculating prominence
+ * @param rel_height Relative height for calculating width (between 0-1)
+ * @param plateau_size_min Minimum plateau size (can be NULL)
+ * @param peaks Output array of peak indices (must be freed using free)
+ * @param properties Output peak properties (must be freed using free_peak_properties)
+ * @return Number of peaks
  */
 size_t find_peaks(const double* x, size_t n,
-                 const double* height_min, const double* height_max,
-                 const double* threshold_min, const double* threshold_max,
+                 const double* height_min,
                  size_t distance,
-                 const double* prominence_min, const double* prominence_max,
-                 const double* width_min, const double* width_max,
+                 const double* prominence_min,
+                 const double* width_min,
                  size_t wlen, double rel_height,
-                 const size_t* plateau_size_min, const size_t* plateau_size_max,
+                 const size_t* plateau_size_min,
                  size_t** peaks, PeakProperties* properties);
 
 /**
- * 使用小波變換查找信號中的峰值
- * @param vector 輸入信號數組
- * @param n 信號長度
- * @param widths 小波寬度數組
- * @param n_widths 小波寬度數量
- * @param min_snr 最小信噪比
- * @param noise_perc 噪聲百分比
- * @param peaks 輸出的峰值索引數組 (需要使用free釋放)
- * @return 峰值數量
- */
-size_t find_peaks_cwt(const double* vector, size_t n, 
-                     const double* widths, size_t n_widths,
-                     double min_snr, double noise_perc,
-                     size_t** peaks);
-
-/**
- * 釋放峰值屬性結構中的內存
- * @param props 要釋放的峰值屬性結構
+ * Free memory in the peak properties structure
+ * @param props The peak properties structure to free
  */
 void free_peak_properties(PeakProperties* props);
 
 /**
- * 計算峰值的顯著性
- * @param x 輸入信號數組
- * @param n 信號長度
- * @param peaks 峰值索引數組
- * @param n_peaks 峰值數量
- * @param wlen 窗口長度 (可為0表示使用全部信號)
- * @param prominences 輸出的顯著性數組 (需要預先分配)
- * @param left_bases 輸出的左側基底索引 (需要預先分配)
- * @param right_bases 輸出的右側基底索引 (需要預先分配)
+ * Calculate peak prominences
+ * @param x Input signal array
+ * @param n Signal length
+ * @param peaks Peak indices array
+ * @param n_peaks Number of peaks
+ * @param wlen Window length (can be 0 to use the entire signal)
+ * @param prominences Output prominences array (must be pre-allocated)
+ * @param left_bases Output left base indices (must be pre-allocated)
+ * @param right_bases Output right base indices (must be pre-allocated)
  */
 void peak_prominences(const double* x, size_t n,
                      const size_t* peaks, size_t n_peaks,
@@ -104,19 +79,19 @@ void peak_prominences(const double* x, size_t n,
                      size_t* right_bases);
 
 /**
- * 計算峰值的寬度
- * @param x 輸入信號數組
- * @param n 信號長度
- * @param peaks 峰值索引數組
- * @param n_peaks 峰值數量
- * @param rel_height 相對高度 (0-1之間)
- * @param prominences 峰值顯著性數組
- * @param left_bases 左側基底索引數組
- * @param right_bases 右側基底索引數組
- * @param widths 輸出的寬度數組 (需要預先分配)
- * @param width_heights 輸出的寬度高度數組 (需要預先分配)
- * @param left_ips 輸出的左側交叉點數組 (需要預先分配)
- * @param right_ips 輸出的右側交叉點數組 (需要預先分配)
+ * Calculate peak widths
+ * @param x Input signal array
+ * @param n Signal length
+ * @param peaks Peak indices array
+ * @param n_peaks Number of peaks
+ * @param rel_height Relative height (between 0-1)
+ * @param prominences Peak prominences array
+ * @param left_bases Left base indices array
+ * @param right_bases Right base indices array
+ * @param widths Output widths array (must be pre-allocated)
+ * @param width_heights Output width heights array (must be pre-allocated)
+ * @param left_ips Output left intersection points array (must be pre-allocated)
+ * @param right_ips Output right intersection points array (must be pre-allocated)
  */
 void peak_widths(const double* x, size_t n,
                 const size_t* peaks, size_t n_peaks,
