@@ -1,1 +1,1 @@
-Bobo 愛情騙子
+Please donate to the author. Thanks ^^
