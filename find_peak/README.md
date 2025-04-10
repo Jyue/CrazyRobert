@@ -121,6 +121,8 @@ Small differences between the C and Python implementations are expected due to:
 - Platform-specific behavior
 
 The most important validation metric is that both implementations identify the same peak locations with similar prominence and width values.
+![image](https://github.com/user-attachments/assets/25b71f07-bedb-47bc-9898-a0fba10b4fb7)
+
 
 ## References
 
